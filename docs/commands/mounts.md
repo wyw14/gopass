@@ -14,6 +14,7 @@ This feature is modeled after standard POSIX mount semantics.
 
 ```
 $ gopass mounts
+$ gopass mounts --json
 $ gopass mounts add mount/point /path/to/store
 $ gopass mounts remove mount/point
 $ gopass mounts versions
@@ -25,6 +26,24 @@ $ gopass mounts versions
 * List existing mounts
 * Remove an existing mount
 * Display the versions of the external tools used by the mounts
+
+## JSON output
+
+`gopass mounts --json` (or `-j`) prints the mounts as a JSON array, sorted by
+alias, with one object per mount mapping the alias to its local store path:
+
+```json
+[
+  {
+    "alias": "mount/point",
+    "path": "/path/to/store"
+  }
+]
+```
+
+With no mounts configured an empty array (`[]`) is printed. Paths are emitted
+verbatim, so spaces and other special characters are preserved and the output
+can be parsed directly by scripts, e.g. `gopass mounts --json | jq`.
 
 ## Subcommands
 

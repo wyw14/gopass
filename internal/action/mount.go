@@ -38,9 +38,22 @@ func (s *mountHandler) MountRemove(ctx context.Context, cmd *cli.Command) error 
 	return nil
 }
 
+// mountInfo describes a single mount for machine readable output. The path is
+// the local path of the mounted store and is emitted verbatim, i.e. spaces and
+// other special characters are preserved by the JSON encoding.
+type mountInfo struct {
+	Alias string `json:"alias"`
+	Path  string `json:"path"`
+}
+
 // MountsPrint prints all existing mounts.
 func (s *mountHandler) MountsPrint(ctx context.Context, cmd *cli.Command) error {
 	ctx = ctxutil.WithGlobalFlags(ctx, cmd)
+
+	if cmd.Bool("json") {
+		return s.mountsJSON()
+	}
+
 	if len(s.Store.Mounts()) < 1 {
 		out.Printf(ctx, "No mounts")
 
@@ -62,6 +75,30 @@ func (s *mountHandler) MountsPrint(ctx context.Context, cmd *cli.Command) error 
 	fmt.Fprintln(stdout, root.Format(tree.INF))
 
 	return nil
+}
+
+// mountsJSON prints all existing mounts as a JSON array of objects, one per
+// mount alias, with the alias and its local store path. The aliases are sorted
+// so the output is deterministic. With no mounts configured an empty array is
+// emitted, so the output is always valid JSON that scripts can parse directly.
+func (s *mountHandler) mountsJSON() error {
+	mounts := s.Store.Mounts()
+	aliases := make([]string, 0, len(mounts))
+	for alias := range mounts {
+		aliases = append(aliases, alias)
+	}
+	sort.Strings(aliases)
+
+	mps := make([]mountInfo, 0, len(aliases))
+	for _, alias := range aliases {
+		mps = append(mps, mountInfo{
+			Alias: alias,
+			Path:  mounts[alias],
+		})
+	}
+	debug.Log("mountsJSON - %+v", mps)
+
+	return jsonWrite(stdout, mps)
 }
 
 // MountsComplete will print a list of existings mount points for bash

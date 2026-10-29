@@ -843,6 +843,13 @@ func (s *Action) GetCommands() []*cli.Command {
 				"subcommands to create or remove mounts.",
 			Before: s.IsInitialized,
 			Action: s.MountsPrint,
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:    "json",
+					Aliases: []string{"j"},
+					Usage:   "Output mounts as a JSON array of objects with alias and local path",
+				},
+			},
 			Commands: []*cli.Command{
 				{
 					Name:    "add",
