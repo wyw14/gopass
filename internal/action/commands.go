@@ -650,6 +650,11 @@ func (s *Action) GetCommands() []*cli.Command {
 					Aliases: []string{"p"},
 					Usage:   "Include passwords in output",
 				},
+				&cli.IntFlag{
+					Name:    "limit",
+					Aliases: []string{"l"},
+					Usage:   "Display no more than this many revisions",
+				},
 			},
 		},
 		{

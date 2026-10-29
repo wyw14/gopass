@@ -21,6 +21,14 @@ func (s *searchHandler) History(ctx context.Context, cmd *cli.Command) error {
 		return exit.Error(exit.Usage, nil, "Usage: %s history <NAME>", s.Name)
 	}
 
+	limit := 0
+	if cmd.IsSet("limit") {
+		limit = cmd.Int("limit")
+		if limit <= 0 {
+			return exit.Error(exit.Usage, nil, "Limit must be a positive integer")
+		}
+	}
+
 	if !s.Store.Exists(ctx, name) {
 		return exit.Error(exit.NotFound, nil, "Secret not found")
 	}
@@ -28,6 +36,10 @@ func (s *searchHandler) History(ctx context.Context, cmd *cli.Command) error {
 	revs, err := s.Store.ListRevisions(ctx, name)
 	if err != nil {
 		return exit.Error(exit.Unknown, err, "Failed to get revisions: %s", err)
+	}
+
+	if limit > 0 && len(revs) > limit {
+		revs = revs[:limit]
 	}
 
 	for _, rev := range revs {

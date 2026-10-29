@@ -3,6 +3,7 @@ package action
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/blang/semver/v4"
@@ -61,13 +62,58 @@ func TestHistory(t *testing.T) {
 		require.NoError(t, act.Insert(ctx, gptest.CliCtx(ctx, t, "bar")))
 	})
 
+	t.Run("update bar a second time", func(t *testing.T) {
+		defer buf.Reset()
+		require.NoError(t, act.insertStdin(ctx, "bar", []byte("pw2"), false))
+	})
+
+	t.Run("update bar a third time", func(t *testing.T) {
+		defer buf.Reset()
+		require.NoError(t, act.insertStdin(ctx, "bar", []byte("pw3"), false))
+	})
+
 	t.Run("history bar", func(t *testing.T) {
 		defer buf.Reset()
 		require.NoError(t, act.History(ctx, gptest.CliCtx(ctx, t, "bar")))
+		// one "Save secret" subject per printed revision
+		require.Equal(t, 3, strings.Count(buf.String(), "Save secret"))
 	})
 
 	t.Run("history --password bar", func(t *testing.T) {
 		defer buf.Reset()
 		require.NoError(t, act.History(ctx, gptest.CliCtxWithFlags(ctx, t, map[string]string{"password": "true"}, "bar")))
+		require.Equal(t, 3, strings.Count(buf.String(), "Save secret"))
+	})
+
+	t.Run("history --limit=1 bar", func(t *testing.T) {
+		defer buf.Reset()
+		require.NoError(t, act.History(ctx, gptest.CliCtxWithFlags(ctx, t, map[string]string{"limit": "1"}, "bar")))
+		require.Equal(t, 1, strings.Count(buf.String(), "Save secret"))
+	})
+
+	t.Run("history --limit=2 --password bar", func(t *testing.T) {
+		defer buf.Reset()
+		require.NoError(t, act.History(ctx, gptest.CliCtxWithFlags(ctx, t, map[string]string{"limit": "2", "password": "true"}, "bar")))
+		require.Equal(t, 2, strings.Count(buf.String(), "Save secret"))
+		// the limited revisions carry the newest passwords pw3 and pw2, not pw
+		require.Contains(t, buf.String(), " - pw3")
+		require.Contains(t, buf.String(), " - pw2")
+		require.NotContains(t, buf.String(), " - pw1")
+	})
+
+	t.Run("history --limit=10 bar shows all revisions", func(t *testing.T) {
+		defer buf.Reset()
+		require.NoError(t, act.History(ctx, gptest.CliCtxWithFlags(ctx, t, map[string]string{"limit": "10"}, "bar")))
+		require.Equal(t, 3, strings.Count(buf.String(), "Save secret"))
+	})
+
+	t.Run("history --limit=0 bar fails", func(t *testing.T) {
+		defer buf.Reset()
+		require.ErrorContains(t, act.History(ctx, gptest.CliCtxWithFlags(ctx, t, map[string]string{"limit": "0"}, "bar")), "positive integer")
+	})
+
+	t.Run("history --limit=-1 bar fails", func(t *testing.T) {
+		defer buf.Reset()
+		require.ErrorContains(t, act.History(ctx, gptest.CliCtxWithFlags(ctx, t, map[string]string{"limit": "-1"}, "bar")), "positive integer")
 	})
 }
