@@ -314,7 +314,7 @@ _gopass () {
 	      "help:Shows a list of commands or help for one command"
 	      )
 	      _describe -t commands "gopass otp" subcommands
-	      _arguments : "--alsoclip[Copy the time-based token and show it]" "--clip[Copy the time-based token into the clipboard]" "--qr[Write QR code to FILE]" "--chained[chain the token to the password]" "--password[Only display the token]" "--snip[Scan screen content to insert a OTP QR code into provided entry]" "--help[show help]"
+	      _arguments : "--alsoclip[Copy the time-based token and show it]" "--clip[Copy the time-based token into the clipboard]" "--qr[Write QR code to FILE]" "--chained[chain the token to the password]" "--password[Only display the token]" "--at[Calculate the TOTP token for this RFC3339 timestamp (with timezone, e.g. 2006-01-02T15:04:05Z07:00) instead of the current time; prints once with no refresh. TOTP only, can not be combined with --qr or --snip]" "--snip[Scan screen content to insert a OTP QR code into provided entry]" "--help[show help]"
 	      
 	      _gopass_complete_passwords
 	      ;;

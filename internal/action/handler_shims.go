@@ -9,6 +9,7 @@ package action
 
 import (
 	"context"
+	"time"
 
 	"github.com/gopasspw/gopass/internal/backend"
 	"github.com/urfave/cli/v3"
@@ -288,8 +289,8 @@ func (s *Action) Env(ctx context.Context, cmd *cli.Command) error { return s.env
 func (s *Action) OTP(ctx context.Context, cmd *cli.Command) error { return s.otpH.OTP(ctx, cmd) }
 
 // Internal methods accessed from tests.
-func (s *Action) otp(ctx context.Context, name, qrf string, clip, pw, recurse, chained, alsoClip bool) error {
-	return s.otpH.otp(ctx, name, qrf, clip, pw, recurse, chained, alsoClip)
+func (s *Action) otp(ctx context.Context, name, qrf string, clip, pw, recurse, chained, alsoClip bool, at time.Time) error {
+	return s.otpH.otp(ctx, name, qrf, clip, pw, recurse, chained, alsoClip, at)
 }
 
 // ── miscHandler shims ──────────────────────────────────────────────────────

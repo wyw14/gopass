@@ -510,6 +510,9 @@ Tries to parse an OTP URL (otpauth://). URL can be TOTP or HOTP. The URL can be 
 \fB\-C\fR,
 Copy the time-based token and show it
 .TP
+\fB\-\-at\fR,
+Calculate the TOTP token for this RFC3339 timestamp (with timezone, e.g. 2006-01-02T15:04:05Z07:00) instead of the current time; prints once with no refresh. TOTP only, can not be combined with --qr or --snip
+.TP
 \fB\-\-chained\fR,
 \fB\-p\fR,
 chain the token to the password

@@ -30,18 +30,37 @@ and the `github.com/kbinani/screenshot` package will not be linked into the bina
 ## Modes of operation
 
 * Generate the current TOTP token from a valid OTP URL
+* Generate a TOTP token for a fixed point in time with `--at`, e.g. to diagnose client clock drift.
 * Snip the screen to add a TOTP QR code as an OTP field to an entry.
+
+## Computing a token for a specific time (`--at`)
+
+`--at` takes an RFC3339 timestamp with a timezone (for example
+`2024-01-02T15:04:05Z` or `2024-01-02T16:04:05+01:00`) and computes the TOTP
+token for exactly that instant. Different timezone representations of the same
+instant produce the same token, and at an exact period boundary the token for
+the new period is returned. The entry's own `period`, `digits`, `algorithm` and
+`encoder` are used.
+
+The token is printed exactly once; no countdown or periodic refresh is started.
+`--password`, `--clip`/`--alsoclip` and `--chained` keep working on that single
+token. `--at` is only supported for TOTP entries: HOTP entries are rejected and
+their `counter` is never modified. It can not be combined with `--qr` or
+`--snip`, and invalid timestamps are rejected before any token is generated.
+When `--at` is omitted, the regular real-time generation (and HOTP counter
+handling) is unchanged.
 
 ## Flags
 
-| Flag         | Aliases | Description                                                              |
-|--------------|---------|--------------------------------------------------------------------------|
-| `--clip`     | `-c`    | Copy the time-based token into the clipboard.                            |
-| `--alsoclip` | `-C`    | Copy the time-based token into the clipboard and show it.                |
-| `--qr`       | `-q`    | Write QR code to file.                                                   |
-| `--chained`  | `-p`    | chain the token to the password                                          |
-| `--password` | `-o`    | Only display the token. For use in scripts.                              |
-| `--snip`     | `-s`    | Try and find a QR code in the screen content to add as OTP to the entry. |
+| Flag         | Aliases | Description                                                                                                                                  |
+|--------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `--at`       |         | Calculate the TOTP token for the given RFC3339 timestamp (with timezone) instead of the current time; prints once, TOTP only.                |
+| `--clip`     | `-c`    | Copy the time-based token into the clipboard.                                                                                                |
+| `--alsoclip` | `-C`    | Copy the time-based token into the clipboard and show it.                                                                                    |
+| `--qr`       | `-q`    | Write QR code to file.                                                                                                                       |
+| `--chained`  | `-p`    | chain the token to the password                                                                                                              |
+| `--password` | `-o`    | Only display the token. For use in scripts.                                                                                                  |
+| `--snip`     | `-s`    | Try and find a QR code in the screen content to add as OTP to the entry.                                                                     |
 
 ## Supported formats
 

@@ -929,6 +929,10 @@ func (s *Action) GetCommands() []*cli.Command {
 					Aliases: []string{"o"},
 					Usage:   "Only display the token",
 				},
+				&cli.StringFlag{
+					Name:  "at",
+					Usage: "Calculate the TOTP token for this RFC3339 timestamp (with timezone, e.g. 2006-01-02T15:04:05Z07:00) instead of the current time; prints once with no refresh. TOTP only, can not be combined with --qr or --snip",
+				},
 			}, otp.SnipFlags()...),
 		},
 		{
