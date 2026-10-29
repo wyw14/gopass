@@ -58,6 +58,10 @@ type Report struct {
 
 	Template string        `json:"-"`
 	Duration time.Duration `json:"duration_ns"`
+
+	// Baseline, if set, is included in the JSON output only. It contains the
+	// differences against a previously recorded baseline report.
+	Baseline *BaselineComparison `json:"-"`
 }
 
 type ReportBuilder struct {

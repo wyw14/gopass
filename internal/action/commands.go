@@ -163,6 +163,10 @@ func (s *Action) GetCommands() []*cli.Command {
 					Usage:   "Output filename. Used for csv and html",
 				},
 				&cli.StringFlag{
+					Name:  "baseline",
+					Usage: "Compare against a previous JSON audit report (created with --format json). The differences are included in the JSON output. Only supported together with --format json.",
+				},
+				&cli.StringFlag{
 					Name:  "template",
 					Usage: "HTML template. If not set use the built-in default.",
 				},

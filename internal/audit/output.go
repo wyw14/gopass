@@ -128,22 +128,33 @@ func (r *Report) RenderCSV(w io.Writer) error {
 	return cw.Error()
 }
 
-// RenderJSON writes the report as a JSON object to w.
+// RenderJSON writes the report as a JSON object to w. The full current report
+// is always preserved. If a baseline comparison is attached it is rendered
+// under the "baseline" key. The report is rendered completely before it is
+// written so callers never observe a partial comparison report.
 func (r *Report) RenderJSON(w io.Writer) error {
 	type jsonReport struct {
 		Duration string                  `json:"duration"`
 		Secrets  map[string]SecretReport `json:"secrets"`
+		Baseline *BaselineComparison     `json:"baseline,omitempty"`
 	}
 
 	payload := jsonReport{
 		Duration: r.Duration.Round(time.Millisecond).String(),
 		Secrets:  r.Secrets,
+		Baseline: r.Baseline,
 	}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
+	buf, err := json.MarshalIndent(payload, "", "  ")
+	if err != nil {
+		return err
+	}
 
-	return enc.Encode(payload)
+	buf = append(buf, '\n')
+
+	_, err = w.Write(buf)
+
+	return err
 }
 
 func (r *Report) RenderHTML(w io.Writer) error {
