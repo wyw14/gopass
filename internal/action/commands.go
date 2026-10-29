@@ -1200,6 +1200,28 @@ func (s *Action) GetCommands() []*cli.Command {
 			ShellComplete: s.Complete,
 		},
 		{
+			Name:      "revert",
+			Usage:     "Revert a secret to a previous revision",
+			ArgsUsage: "<NAME> <REVISION>",
+			Description: "" +
+				"Restore the content of a past revision as the current version of a secret. " +
+				"The historical content is decrypted and then re-encrypted for the currently " +
+				"usable recipients before it is written as a new revision. The old ciphertext " +
+				"is never restored directly and the Git history is preserved (no branch reset, " +
+				"no commits are removed). Use 'gopass history <NAME>' to list available revisions. " +
+				"Exact revision hashes as well as -<N> (the Nth oldest revision) are supported.",
+			Before:        s.IsInitialized,
+			Action:        s.Revert,
+			ShellComplete: s.Complete,
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:    "yes",
+					Aliases: []string{"y"},
+					Usage:   "Always answer yes to yes/no questions",
+				},
+			},
+		},
+		{
 			Name:  "setup",
 			Usage: "Initialize a new password store",
 			Description: "" +

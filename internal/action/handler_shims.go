@@ -36,6 +36,10 @@ func (s *Action) Link(ctx context.Context, cmd *cli.Command) error { return s.se
 
 func (s *Action) Merge(ctx context.Context, cmd *cli.Command) error { return s.secrets.Merge(ctx, cmd) }
 
+func (s *Action) Revert(ctx context.Context, cmd *cli.Command) error {
+	return s.secrets.Revert(ctx, cmd)
+}
+
 // Internal methods accessed from tests.
 func (s *Action) show(ctx context.Context, cmd *cli.Command, name string, recurse bool) error {
 	return s.secrets.show(ctx, cmd, name, recurse)
